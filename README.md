@@ -34,17 +34,16 @@ concentrations — all in under 30 seconds, without a haemocytometer.
 
 Counting cells with a haemocytometer is slow, tedious, and notoriously variable
 between operators. Automated cell counters solve this but cost several thousand
-pounds and lock you into proprietary consumables.
+pounds, lock you into proprietary consumables, and are impossible to repair yourself.
 
 This project turns an OpenFlexure Microscope — an open-source, 3D-printed,
 motorised microscope — into an automated cell counter. You pipette your
 suspension onto a coverslip, press a button, and get a cell count and
 concentration back in a few seconds.
 
-**What makes it different from just running a counting app:** cell segmentation
-uses [Cellpose](https://www.cellpose.org/), a deep-learning model that handles
-touching, overlapping, and irregularly shaped cells far better than the
-threshold-and-watershed approach in most free tools. 
+There are 2 options for performing cell segmentation; either a traditional threshold-and-watershed approach or one that uses [Cellpose](https://www.cellpose.org/), a deep-learning model that handles
+touching, overlapping, and irregularly shaped cells far better. 
+
 
 > 📝 **TODO —** Add a sentence on which cell type(s) you have validated this
 > with, and the concentration range over which it works. Readers will want to
@@ -54,9 +53,7 @@ threshold-and-watershed approach in most free tools.
 
 ## Who it's for
 
-This Cell Counter, as the OpenFlexure Microscope itself, is designed to be assembled and be usable by someone with **no programming experience**. The setup involves a few one-time steps that can be walked through
-click-by-click; after that, daily use is a graphical interface with a button
-that says "Capture".
+This Cell Counter, as the OpenFlexure Microscope itself, is designed to be assembled and be usable by someone with **no programming or engineering experience**. The setup involves a few one-time steps for which detailed click-by-click guides have been written out; after that, daily use is a graphical interface with a few buttons.
 
 You will need to be comfortable with:
 
@@ -65,11 +62,13 @@ You will need to be comfortable with:
 - Asking your IT team a simple question (we've drafted the wording for you)
 
 You will **not** need to write code, use a command line day-to-day, or
-understand how the machine learning works.
+understand how the machine learning works. However, information on all of the code is provided if you would wish to adapt/improve on what I have made here. 
 
 ---
 
 ## How it works
+
+The process of counting cells is functionally identical to what can be done manually in a haemocytometer. 
 
 There are two computers involved, which sounds more complicated than it is.
 

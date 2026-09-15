@@ -1,0 +1,20 @@
+# Server-side dependencies for the CellPose cell counter worker.
+# Tested against Python 3.9-3.11. CellPose 2.x requires <3.11 on some
+# platforms; 3.10 is the safest choice.
+
+# --- Pin CellPose to the 2.x line -------------------------------------
+# Your existing pipeline was written against CellPose 2 (model_type='cyto2',
+# the net_avg argument, and the 3-tuple eval() return). CellPose 3 and 4
+# changed all three. Pin it so a future `pip install -U` cannot silently
+# change your cell counts mid-study.
+cellpose==2.2.3
+numpy<2.0            # cellpose 2.x predates the numpy 2 ABI break
+
+# --- Web service ------------------------------------------------------
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.27,<1.0
+python-multipart>=0.0.9    # required for multipart/form-data uploads
+pillow>=9.0
+
+# torch is installed separately -- see SETUP.md. For CPU-only:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
