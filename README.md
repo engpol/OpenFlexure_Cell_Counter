@@ -1,7 +1,7 @@
 # OpenFlexure Cell Counter
 
 A simple automated cell counter built on the [OpenFlexure Microscope](https://openflexure.org/),
-using deep-learning segmentation to count cells in suspension to assist in calculating
+using either traditional contrast-based or deep-learning segmentation to count cells in suspension to assist in calculating
 concentrations — all in under 30 seconds, without a haemocytometer.
 
 > 📝 **TODO —** Add a photo or short GIF of the assembled instrument here. It is
@@ -59,7 +59,7 @@ You will need to be comfortable with:
 
 - Pipetting onto a coverslip
 - Following a step-by-step setup guide once
-- Asking your IT team a simple question (we've drafted the wording for you)
+
 
 You will **not** need to write code, use a command line day-to-day, or
 understand how the machine learning works. However, information on all of the code is provided if you would wish to adapt/improve on what I have made here. 
@@ -68,41 +68,32 @@ understand how the machine learning works. However, information on all of the co
 
 ## How it works
 
-The process of counting cells is functionally identical to what can be done manually in a haemocytometer. 
+The process of counting cells is functionally identical to what can be done manually in a haemocytometer. However we can use the fact that the exact effective field of view of the camera is known, to forgo the need for a machined chamber.  
 
-There are two computers involved, which sounds more complicated than it is.
+The microscope photographs **four fields of view**, which together cover a small
+fraction of the coverslip:
+
+| Quantity | Value |
+|---|---|
+| Area of one field of view | 0.0584 mm² |
+| Four fields combined | 0.2336 mm² |
+| Area of a 22 × 22 mm coverslip | 484 mm² |
+| **Fraction of the sample you actually see** | **1 / 2072** |
+
+Then the microscope will use one of either methods to calculate the number of cells across all 4 images.
+
+So if the microscope counts 150 cells:
 
 ```
-   YOU                MICROSCOPE                    ANALYSIS COMPUTER
-    │                (Raspberry Pi)                  (any Windows/Linux PC)
-    │                      │                                │
-    │  pipette sample      │                                │
-    │─────────────────────►│                                │
-    │  press "Capture"     │                                │
-    │─────────────────────►│                                │
-    │                      │  moves stage, takes            │
-    │                      │  4 photos, joins them          │
-    │                      │                                │
-    │                      │───── sends image ─────────────►│
-    │                      │                                │  finds every cell
-    │                      │                                │  using Cellpose
-    │                      │◄──── count + outlines ─────────│
-    │                      │                                │
-    │  count, concentration│                                │
-    │  and a picture of    │                                │
-    │◄─────────────────────│                                │
-    │  what was counted    │                                │
+Total cells on coverslip  = 150 × 2072  = 310,800 cells
+Volume pipetted           = 50 µL       = 0.05 mL
+Concentration             = 310,800 / 0.05 = 6.2 × 10⁶ cells/mL
 ```
 
-**Why two computers?** The Raspberry Pi inside the microscope is excellent at
-controlling motors and cameras, but too slow to run a modern segmentation model
-— it would take several minutes per sample. A normal desktop PC does the same
-job in a few seconds. The two are connected by a single Ethernet cable.
+This calculation only works on assumption the cells are **evenly distributed** across the coverslip. Thus it is important to let the
+sample settle, mix it thoroughly before pipetting, and take a second reading if a
+number looks surprising.
 
-**Why the model stays loaded.** The analysis computer runs a small program that
-loads Cellpose once when it starts and then keeps it in memory. Loading the
-model takes longer than using it, so keeping it warm is what makes each
-measurement fast rather than slow.
 
 ---
 
@@ -112,65 +103,29 @@ measurement fast rather than slow.
 
 | Item | Notes | Approx. cost |
 |---|---|---|
-| [OpenFlexure Microscope](https://openflexure.org/) | Simple optics are sufficient and use most up-to-date hardware version | <!-- TODO --> |
-| Raspberry Pi 4B | I used 4B, but 2 GB is sufficient | <!-- TODO --> |
-| Analysis computer | Any PC running Windows 10 and above. If not using GitHub method | Existing hardware |
+| [OpenFlexure Microscope](https://openflexure.org/) | Simple optics are sufficient and use most up-to-date hardware version | ~100£ or ~160£ from a vendor (Exluding RPi) |
+| Raspberry Pi 4B | I used 4B, but 2 GB is sufficient | These have recently got more expensive, so expect 50-90£ |
+| Analysis computer | Any PC running Windows 10 and above. | Existing hardware |
 | Ethernet patch cable | Ordinary cable | ~£5 |
 | 22 × 22 mm glass coverslips | Whatever's cheapest, I just wash and re-use mine until they crack | £5 |
-| 3D-printed parts | STLs in [`hardware/`](hardware/) | Filament cost |
+| 3D-printed parts | STLs in [`hardware/`](hardware/) | Filament cost or ~10£ if using external service |
 
-> 📝 **TODO —** Fill in costs and add anything specific to your build (slide
-> holders, illumination changes, custom stage inserts). A total build cost is
-> the number readers will look for first.
+### Total Cost:
+
+~ 120£ 
 
 ### Software
 
-Everything needed is free and open-source. The setup guides install it for you.
+Everything needed is free and open-source. The easiest way to get the cell counter running is by using the pre-configured image which can be downloaded using the button below (~9.1 GB).
 
-- Raspberry Pi OS on the microscope (a pre-configured image is provided)
-- Python plus Cellpose on the analysis computer
+[![Download](https://img.shields.io/badge/Download-OFM_Cell_Counter_IMAGE_(9.1_GB)-blue?style=for-the-badge&logo=download)](https://archive.org/download/ofm-cell-counter/OFM_Cell_Counter.img)
 
----
-
-## Repository structure
-
-```
-.
-├── hardware/              3D-printable parts and assembly notes
-│   ├── stl/               Ready-to-print STL files
-│   ├── source/            Editable CAD source
-│   └── ASSEMBLY.md        Build instructions
-│
-├── microscope/            Software that runs on the Raspberry Pi
-│   ├── Cell_Counter_Main.py          The graphical interface
-│   ├── Microscope_Control_Functions.py   Stage movement and image capture
-│   ├── Image_tiling.py               Joins the four images together
-│   └── Server_Workflow.py            Talks to the analysis computer
-│
-├── server/                Software that runs on the analysis computer
-│   ├── worker.py          Keeps Cellpose loaded and answers requests
-│   ├── benchmark.py       Measures speed and calibrates cell diameter
-│   ├── requirements.txt   Python packages needed
-│   └── run_worker.bat     Starts the analysis service on Windows
-│
-├── docs/                  Setup guides
-│   ├── SETUP.md           Full installation walkthrough
-│   ├── DIRECT_LINK_ADMIN.md   Connecting the two computers
-│   └── NETWORK_SETUP.md   Alternatives for different lab networks
-│
-└── examples/              Sample images and expected outputs
-```
-
-> 📝 **TODO —** Adjust to match your actual layout, and add a link to the
-> pre-configured Raspberry Pi image (it will be too large for GitHub — Zenodo or
-> institutional storage works well, and Zenodo gives you a DOI).
 
 ---
 
 ## Getting started
 
-Budget about **two hours** for first-time setup, most of which is unattended
-installation.
+Budget about **two hours** for first-time setup, excluding building the microscope.
 
 ### 1. Build the microscope
 
@@ -184,32 +139,22 @@ Download the pre-configured image (link above) and write it to an SD card with
 [Raspberry Pi Imager](https://www.raspberrypi.com/software/). Everything —
 microscope software, network settings, cell counter — is already installed.
 
-> 📝 **TODO —** State the default username and password, and tell users to
-> change them. Also note the image size and SD card requirement.
+I recommend a 32 GB SSD, but anything above 10 GB should be fine.
 
-### 3. Connect the two computers
+### 3. OPTIONAL - IF USING CELLPOSE
 
-Plug an Ethernet cable between the microscope and the analysis computer, then
+If wanting to use Cellpose for segmentation, plug an Ethernet cable between the microscope and the analysis computer, then
 follow [`docs/DIRECT_LINK_ADMIN.md`](docs/DIRECT_LINK_ADMIN.md). It's a
-click-by-click guide that assumes no networking knowledge.
+click-by-click guide.
 
 If your lab already has a normal wired network, the two machines may be able to
 talk to each other with no configuration at all — see
 [`docs/NETWORK_SETUP.md`](docs/NETWORK_SETUP.md) for how to check.
 
-> **A note for institutional users.** University networks (eduroam and similar)
-> usually stop devices talking to each other for security reasons. This is why
-> we recommend a direct cable: it sidesteps the issue entirely and doesn't
-> depend on your IT department's configuration. If your analysis computer is
-> managed by IT, do check with them before connecting a second network cable —
-> `docs/DIRECT_LINK_ADMIN.md` includes a short message you can send.
-
-### 4. Install the analysis software
-
-Follow [`docs/SETUP.md`](docs/SETUP.md) Part A. It installs Python and Cellpose
+Then, follow [`docs/SETUP.md`](docs/SETUP.md) Part A. It installs Python and Cellpose
 into a self-contained folder, so nothing else on the computer is affected.
 
-### 5. Calibrate
+### 4. Calibrate
 
 **Don't skip this.** Run the calibration described in
 [Validating your instrument](#validating-your-instrument) before using the
@@ -217,68 +162,37 @@ counter for real experiments.
 
 ---
 
-## Daily use
+## Daily use 
 
-1. Turn on the microscope and the analysis computer. The analysis service starts
+1. Turn on the microscope (and optionally the analysis computer). The analysis service starts
    by itself.
 2. Pipette **50 µL** of cell suspension onto a 22 × 22 mm coverslip and mount it.
-3. Launch the cell counter:
-   ```bash
-   ./Cell_Counter_Activate.sh
-   ```
-   > 📝 **TODO —** If you've added a desktop shortcut to the image, describe it
-   > here instead — most users would rather double-click an icon.
-4. Focus using the on-screen controls.
-5. Press **Capture**. The microscope takes four images across the coverslip.
-6. Press **Process**. Results appear in a few seconds:
+3. Launch the appropriate Cell Counter using the Desktop Shortcut:
+    - **Cell Counter Server (fast)** = Use Cellpose (requires analysis computer)
+    - **Cell Counter Local (very fast)** = Use Contrast-based Thresholding (runs on RPi itself) 
+4. Press **Ok**. The microscope takes four images across the coverslip.
+6. Results appear in a few seconds:
    - Total cells counted
    - Concentration in cells/mL
    - An image showing exactly which cells were counted
+Use the on-screen calculator to perform desired dilution calculations
 
 **Always look at the outline image.** It's the quickest way to spot a bad count —
 debris counted as cells, clumps counted as one, or cells missed because the
-focus drifted.
+focus drifted. If there are any problems, try to ammend them, and count again. 
 
-> 📝 **TODO —** Add a screenshot of the interface with results shown.
+If the focus has drifted far too much, you may need to re-focus using the **OFM Connect** tool, which gives you full control over the microscope.
 
----
 
-## How the concentration is calculated
-
-Worth understanding, because it's where most errors come from.
-
-The microscope photographs **four fields of view**, which together cover a small
-fraction of the coverslip:
-
-| Quantity | Value |
-|---|---|
-| Area of one field of view | 0.0584 mm² |
-| Four fields combined | 0.2336 mm² |
-| Area of a 22 × 22 mm coverslip | 484 mm² |
-| **Fraction of the sample you actually see** | **1 / 2072** |
-
-So if the microscope counts 150 cells:
-
-```
-Total cells on coverslip  = 150 × 2072  = 310,800 cells
-Volume pipetted           = 50 µL       = 0.05 mL
-Concentration             = 310,800 / 0.05 = 6.2 × 10⁶ cells/mL
-```
-
-This assumes the cells are **evenly distributed** across the coverslip. Let the
-sample settle, mix it thoroughly before pipetting, and take a second reading if a
-number looks surprising.
-
-> 📝 **TODO —** If you use a different coverslip size or volume, update the
-> constants in `Cell_Counter_Main.py` and this table together — they must match.
 
 ---
+
 
 ## Validating your instrument
 
 Every build is slightly different. Two checks before you trust the numbers.
 
-### 1. Set the expected cell diameter
+### 1. CELLPOSE - Set the expected cell diameter
 
 Cellpose needs to know roughly how large your cells are, in pixels. Getting this
 wrong affects both accuracy and speed.
@@ -314,9 +228,7 @@ If they disagree systematically:
 | Counter always reads **low** | Cells out of focus, diameter set too small, or cells too sparse |
 | Disagreement grows with concentration | Cells clumping, or overlapping cells merged into one object |
 
-> 📝 **TODO —** Add your own validation data — a scatter plot of this counter
-> against haemocytometer counts is the single most persuasive figure you can put
-> in this README, and reviewers will ask for it.
+
 
 ---
 
@@ -329,7 +241,6 @@ Being upfront about these:
   suspensions will undercount, as clumps get merged.
 - **No viability staining.** This counts cells, it does not distinguish live from
   dead. Trypan blue exclusion is not currently supported.
-  > 📝 **TODO —** Remove or amend if you have added this.
 - **Assumes even settling.** Uneven distribution across the coverslip is the
   largest single source of error.
 - **Field-of-view geometry is build-specific.** The area constants assume a
@@ -372,17 +283,11 @@ Contributions are very welcome, especially:
 Please open an issue before starting substantial work, so we can avoid
 duplication.
 
-> 📝 **TODO —** Add a CONTRIBUTING.md and a code of conduct if you expect
-> outside contributors.
 
 ---
 
 ## Licence and citation
 
-> 📝 **TODO —** Choose a licence. Note that if your hardware derives from
-> OpenFlexure parts you may be constrained by their licence terms (CERN-OHL for
-> hardware, and check the software licence separately). Common choices:
-> CERN-OHL-S for hardware, MIT or GPL-3.0 for software.
 
 If you use this in published work, please cite the underlying tools:
 
@@ -397,12 +302,7 @@ algorithm for cellular segmentation. *Nature Methods* **18**, 100–106 (2021).
 Pachitariu, M. & Stringer, C. Cellpose 2.0: how to train your own model.
 *Nature Methods* **19**, 1634–1641 (2022).
 
-> 📝 **TODO —** Verify these citations against the publisher records, and add
-> your own paper or preprint once available.
-
 ---
 
 ## Acknowledgements
 
-> 📝 **TODO —** Funders, supervisors, lab members, and the OpenFlexure and
-> Cellpose developer communities.
