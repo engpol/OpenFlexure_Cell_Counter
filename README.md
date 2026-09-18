@@ -39,10 +39,14 @@ pounds, lock you into proprietary consumables, and are impossible to repair your
 This project turns an OpenFlexure Microscope — an open-source, 3D-printed,
 motorised microscope — into an automated cell counter. You pipette your
 suspension onto a coverslip, press a button, and get a cell count and
-concentration back in a few seconds.
+concentration back in a few seconds. 
+
+As a side-note, the microscope is a fully motorized and customisable brightfield microscope; the software provided here is simply a single use-case.
 
 There are 2 options for performing cell segmentation; either a traditional threshold-and-watershed approach or one that uses [Cellpose](https://www.cellpose.org/), a deep-learning model that handles
-touching, overlapping, and irregularly shaped cells far better. 
+touching, overlapping, and irregularly shaped cells far better.
+
+The Cellpose model included in the RPi image is **cyto2** fine tuned on images of HEK-293 cells taken on several different OpenFlexure microscopes. It is very easy to swap out the model used for one that you have trained yourself, as is covered in the server setup guide. 
 
 
 > 📝 **TODO —** Add a sentence on which cell type(s) you have validated this
@@ -105,14 +109,14 @@ number looks surprising.
 |---|---|---|
 | [OpenFlexure Microscope](https://openflexure.org/) | Simple optics are sufficient and use most up-to-date hardware version | ~100£ or ~160£ from a vendor (Exluding RPi) |
 | Raspberry Pi 4B | I used 4B, but 2 GB is sufficient | These have recently got more expensive, so expect 50-90£ |
-| Analysis computer | Any PC running Windows 10 and above. | Existing hardware |
-| Ethernet patch cable | Ordinary cable | ~£5 |
+| Analysis computer (Optional) | Any old PC that can be connected to the scope via an ethernet cable. Helps tremendously if it has an NVIDIA Graphics card supporting CUDA, but is not an absolute requirement. | Existing hardware |
+| Ethernet patch cable (Optional) | Ordinary cable | ~£5 |
 | 22 × 22 mm glass coverslips | Whatever's cheapest, I just wash and re-use mine until they crack | £5 |
 | 3D-printed parts | STLs in [`hardware/`](hardware/) | Filament cost or ~10£ if using external service |
 
 ### Total Cost:
 
-~ 120£ 
+**~ 200£** (Excluding Analysis PC - the cost of this will vary depending on what you have lying around) 
 
 ### Software
 
@@ -129,30 +133,30 @@ Budget about **two hours** for first-time setup, excluding building the microsco
 
 ### 1. Build the microscope
 
-Follow the [OpenFlexure assembly instructions](https://build.openflexure.org/),
-then add the parts from [`hardware/`](hardware/). See
-[`hardware/ASSEMBLY.md`](hardware/ASSEMBLY.md).
+Acquire all parts required for the "Basic Optics" variant of the Open Flexure Microscope, and follow the [OpenFlexure assembly instructions](https://build.openflexure.org/). Please check out the list of [associated vendors](https://openflexure.org/about/vendors) if you would prefer to simply buy a complete assembly kit for the microscope.
+Then, once you have finished the build, add the parts from [`STLs`](STLS/Custom_Holder). See
+[`ASSEMBLY.md`](ASSEMBLY.md).
 
 ### 2. Flash the Raspberry Pi
 
 Download the pre-configured image (link above) and write it to an SD card with
 [Raspberry Pi Imager](https://www.raspberrypi.com/software/). Everything —
-microscope software, network settings, cell counter — is already installed.
+OpenFlexure microscope software, network settings, Cell Counter — is already installed.
 
 I recommend a 32 GB SSD, but anything above 10 GB should be fine.
 
+The thresholding-watershed method for Cell Segmentation can run directly from the RPi so, if you do not wish to run Cellpose, this is all you would need to have a functional Cell Counter!
+
 ### 3. OPTIONAL - IF USING CELLPOSE
 
-If wanting to use Cellpose for segmentation, plug an Ethernet cable between the microscope and the analysis computer, then
-follow [`docs/DIRECT_LINK_ADMIN.md`](docs/DIRECT_LINK_ADMIN.md). It's a
-click-by-click guide.
+If wanting to use Cellpose for segmentation, you will need a second computer to run the Cellpose segmentation. 
 
-If your lab already has a normal wired network, the two machines may be able to
-talk to each other with no configuration at all — see
-[`docs/NETWORK_SETUP.md`](docs/NETWORK_SETUP.md) for how to check.
+Sadly, some of the Cellpose dependencies (Torch) are very hard to setup and run dreadfully slow on the 32-bit ARM OS that is required by the OFM. Even after getting it working in my trials, running CellPose on even a couple images on the OFM itself took ~ 15 mins, making it non-viable for daily use.
 
-Then, follow [`docs/SETUP.md`](docs/SETUP.md) Part A. It installs Python and Cellpose
-into a self-contained folder, so nothing else on the computer is affected.
+If you have any old PC lying around, this can be turned into a "server" which can process images taken on the OFM Cell Counter. The process outlining how to do this can be found in [docs/SERVER_SETUP](docs/SERVER_SETUP.md).
+
+The server setup assumes that you may not have full admin rights/control over your WiFI network (As is the case for me, using institutional WiFi). This is why, at least in my guide, the server will have to be directly connected to the Cell Counter via an ethernet cable. Keep this in mind if you are short on space/were hoping to have the server placed in a different room to the cell counter.
+
 
 ### 4. Calibrate
 
@@ -168,7 +172,7 @@ counter for real experiments.
    by itself.
 2. Pipette **50 µL** of cell suspension onto a 22 × 22 mm coverslip and mount it.
 3. Launch the appropriate Cell Counter using the Desktop Shortcut:
-    - **Cell Counter Server (fast)** = Use Cellpose (requires analysis computer)
+    - **Cell Counter Server (fast)** = Use Cellpose (requires ethernet connection to analysis computer)
     - **Cell Counter Local (very fast)** = Use Contrast-based Thresholding (runs on RPi itself) 
 4. Press **Ok**. The microscope takes four images across the coverslip.
 6. Results appear in a few seconds:
@@ -192,27 +196,20 @@ If the focus has drifted far too much, you may need to re-focus using the **OFM 
 
 Every build is slightly different. Two checks before you trust the numbers.
 
-### 1. CELLPOSE - Set the expected cell diameter
+### 1. CELLPOSE 
 
-Cellpose needs to know roughly how large your cells are, in pixels. Getting this
-wrong affects both accuracy and speed.
+Cellpose needs to know roughly how large your cells are, in pixels. Getting this wrong affects both accuracy and speed. If you are finding that you are getting poor segmentation on your cells, before deciding to train your own model, it is worth checking that changing the diameter parameter won't fix your issues. 
 
-On the analysis computer:
+As outlined above, this Cell Counter was validated and setup for HEK-293 cells (where I found a diam value of 15.328 worked best). However, if your cells are significantly smaller/larger, you may need to adjust this parameter.
 
-```bash
-python benchmark.py path/to/an/image.tiff
-```
+To find a good value for this, take a couple images of your cells on your OFM and send it to a PC capable of running cellpose. You will essentially be wanting to open the [Cellpose GUI](https://cellpose.readthedocs.io/en/latest/gui.html), import this image, and press the 'Calibrate' button to find a recommended diameter value. You can also follow this [YouTube guide](https://www.youtube.com/watch?v=5qANHWoubZU) to see how to do this in more detail (From start until ~7 mins in).
 
-This estimates the diameter from your own images and reports how long
-segmentation takes at different settings. Put the recommended value in
-`~/.cell_counter/server.conf` on the microscope:
+Once you have the recommended diameter value, change it in the
+`~/.cell_counter/server.conf` file on the microscope:
 
 ```
 diameter = 40
 ```
-
-> 📝 **TODO —** Record the value that works for your cell line here, so users
-> starting with the same cells have a sensible default.
 
 ### 2. Compare against a haemocytometer
 
@@ -224,7 +221,7 @@ If they disagree systematically:
 
 | Pattern | Likely cause |
 |---|---|
-| Counter always reads **high** | Debris counted as cells, or the four fields overlap so some cells are counted twice |
+| Counter always reads **high** | Debris counted as cells, the four fields overlap so some cells are counted twice |
 | Counter always reads **low** | Cells out of focus, diameter set too small, or cells too sparse |
 | Disagreement grows with concentration | Cells clumping, or overlapping cells merged into one object |
 
@@ -238,17 +235,15 @@ Being upfront about these:
 
 - **Not a validated clinical or diagnostic device.** This is a research tool.
 - **Cells must be reasonably well separated.** Dense or heavily clumped
-  suspensions will undercount, as clumps get merged.
+  suspensions could undercount, as clumps get merged.
 - **No viability staining.** This counts cells, it does not distinguish live from
   dead. Trypan blue exclusion is not currently supported.
 - **Assumes even settling.** Uneven distribution across the coverslip is the
   largest single source of error.
-- **Field-of-view geometry is build-specific.** The area constants assume a
-  particular optics module and camera; if you change either, recalibrate.
+- **Field-of-view geometry is build-specific.** The area constants assume the a specific optics module and camera used in the 'Basic Optics' configuration of the OFM; if you change either, you would have to re-calibrate and modify some of the code.
 - **The four fields may overlap slightly.** Stage movement is calibrated in
   motor steps rather than measured distance, so a small overlap can cause modest
-  double-counting. Worth checking with a stage graticule if you need high
-  accuracy.
+  double-counting. Double check in the output no overlap is present.
 
 ---
 
