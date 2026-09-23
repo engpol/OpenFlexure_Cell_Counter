@@ -16,5 +16,18 @@ uvicorn[standard]>=0.27,<1.0
 python-multipart>=0.0.9    # required for multipart/form-data uploads
 pillow>=9.0
 
-# torch is installed separately -- see SETUP.md. For CPU-only:
-#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+# --- PyTorch: install SEPARATELY, before this file --------------------
+# The wheel you pick decides whether CellPose can use a GPU. Installing the
+# CPU-only wheel on a GPU machine works, but silently runs ~10x slower.
+#
+#   No NVIDIA GPU:
+#     pip install torch --index-url https://download.pytorch.org/whl/cpu
+#
+#   NVIDIA GPU: check `nvidia-smi` for the CUDA version it supports, then
+#   pick a wheel index no higher than that (cu126 / cu128 / cu130):
+#     pip install torch --index-url https://download.pytorch.org/whl/cu128
+#
+#   The CUDA wheels bundle the CUDA runtime, so you need the NVIDIA DRIVER
+#   only -- installing the full CUDA toolkit is not necessary.
+#
+# Verify with:  python check_gpu.py

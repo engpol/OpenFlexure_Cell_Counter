@@ -7,10 +7,10 @@ REM ---------------------------------------------------------------
 REM Bind to loopback only. Reaching it from the Pi is handled by the
 REM tunnel (see SETUP.md Part B). Change to 0.0.0.0 ONLY if you have a
 REM firewall rule permitting inbound connections on this port.
-set HOST=192.168.50.10
+set HOST=127.0.0.1
 set PORT=8000
 
-REM Shared secret. Must match the token on the OpenFlexure Raspberry Pi.
+REM Shared secret. Must match the token on the Raspberry Pi.
 REM Generate once with:
 REM   python -c "import secrets; print(secrets.token_urlsafe(32))"
 if "%CELLCOUNT_TOKEN%"=="" (
@@ -20,14 +20,16 @@ if "%CELLCOUNT_TOKEN%"=="" (
     exit /b 1
 )
 
-REM Set the model and GPU settings.
-
 set CELLCOUNT_MODEL=cyto2
 set CELLCOUNT_GPU=auto
 set CELLCOUNT_DIAMETER=25
 
 cd /d "%~dp0"
 call "%USERPROFILE%\miniforge3\Scripts\activate.bat" cellcount
+
+REM Report GPU status first: a CPU-only wheel on a GPU machine otherwise shows
+REM up only as unexplained slowness.
+python check_gpu.py
 
 REM --workers 1 is deliberate: one process holds one warm model.
 python -m uvicorn worker:app --host %HOST% --port %PORT% --workers 1

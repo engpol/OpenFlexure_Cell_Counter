@@ -1,0 +1,78 @@
+# CellPose cell counter worker.
+#
+# Install:
+#   sudo cp cellcounter-worker.service /etc/systemd/system/
+#   sudo nano /etc/systemd/system/cellcounter-worker.service   # edit User= and paths
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now cellcounter-worker
+#
+# Logs:  journalctl -u cellcounter-worker -f
+
+[Unit]
+Description=CellPose cell counter worker (OpenFlexure microscope)
+Documentation=https://github.com/YOUR-USER/YOUR-REPO
+# Wait for the direct link to have its address before binding to it.
+After=network-online.target
+Wants=network-online.target
+# Retry for ~5 minutes, then stop and report 'failed'.
+#
+# This used to be StartLimitIntervalSec=0 (retry forever), so that a slow
+# network at boot could never defeat it. But that also meant a PERMANENT fault
+# -- a wrong ExecStart path, say -- retried endlessly and sat in
+# 'activating (auto-restart)' rather than 'failed', hiding the real error.
+# Five minutes is ample for the link to come up, and a genuine misconfiguration
+# now surfaces clearly.
+StartLimitIntervalSec=300
+StartLimitBurst=50
+
+[Service]
+Type=simple
+
+# --- EDIT THESE THREE ---------------------------------------------------
+# Replace CHANGEME with your username, and check the python path is real.
+# If you leave CHANGEME in place, systemd fails with status=203/EXEC.
+# Easier: run  sudo bash install_service.sh  which fills these in for you.
+User=CHANGEME
+WorkingDirectory=/opt/cell_counter
+ExecStart=/home/CHANGEME/miniforge3/envs/cellcount/bin/python -m uvicorn worker:app --host 192.168.50.10 --port 8000 --workers 1
+# ------------------------------------------------------------------------
+
+# Token lives in a 0600 file, NOT in this unit -- unit files are world-readable.
+EnvironmentFile=/etc/cell_counter/worker.env
+# Built-in model name, OR an absolute path to a model trained in the
+# CellPose GUI. A path is detected automatically and loaded with
+# pretrained_model= rather than model_type=.
+#   Environment=CELLCOUNT_MODEL=/opt/cell_counter/models/my_custom_model
+Environment=CELLCOUNT_MODEL=cyto2
+Environment=CELLCOUNT_GPU=auto
+
+# Fallback diameter, used only when the Pi does NOT send one. A 'diameter'
+# line in the Pi's server.conf overrides this on every request.
+Environment=CELLCOUNT_DIAMETER=15.33
+
+# CellPose writes downloaded model weights to ~/.cellpose. Nothing here stops
+# it, so no special paths are needed.
+
+# numba (used by cellpose) compiles functions with @njit(cache=True) and must
+# write the compiled artefacts somewhere. By default it tries the __pycache__
+# beside the source file in site-packages, then falls back to a directory under
+# $HOME. If neither is writable it raises:
+#     RuntimeError: cannot cache function 'map_coordinates': no locator available
+# and the worker dies at import time. Pointing numba at an explicit, writable,
+# PERSISTENT directory avoids the problem entirely -- and avoids recompiling on
+# every boot, which a /tmp location would cause.
+Environment=NUMBA_CACHE_DIR=/opt/cell_counter/numba_cache
+
+# The model takes a while to load; don't let systemd think it hung.
+TimeoutStartSec=300
+Restart=on-failure
+RestartSec=5
+
+# Deliberately minimal. Filesystem sandboxing (ProtectSystem=strict,
+# ProtectHome=read-only) was removed: on a single-purpose lab server it buys
+# very little, and it stops CellPose writing its model weights to ~/.cellpose,
+# which makes the worker die at startup for a non-obvious reason.
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

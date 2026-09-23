@@ -46,7 +46,7 @@ As a side-note, the microscope is a fully motorized and customisable brightfield
 There are 2 options for performing cell segmentation; either a traditional threshold-and-watershed approach or one that uses [Cellpose](https://www.cellpose.org/), a deep-learning model that handles
 touching, overlapping, and irregularly shaped cells far better.
 
-The Cellpose model included in the RPi image is **cyto2** fine tuned on images of HEK-293 cells taken on several different OpenFlexure microscopes. It is very easy to swap out the model used for one that you have trained yourself, as is covered in the server setup guide. 
+The Cellpose model included in this repo is **cyto2** fine tuned on images of HEK-293 cells taken on several different OpenFlexure microscopes. It is very easy to swap out the model used for one that you have trained yourself, as is covered in the server setup guide. 
 
 
 > 📝 **TODO —** Add a sentence on which cell type(s) you have validated this
@@ -57,7 +57,8 @@ The Cellpose model included in the RPi image is **cyto2** fine tuned on images o
 
 ## Who it's for
 
-This Cell Counter, as the OpenFlexure Microscope itself, is designed to be assembled and be usable by someone with **no programming or engineering experience**. The setup involves a few one-time steps for which detailed click-by-click guides have been written out; after that, daily use is a graphical interface with a few buttons.
+This Cell Counter is mostly for people working in cell culture who routinely need to perform cell suspension dilution calculations, who may not need/want to spend thousands on more advanced systems. 
+This counter, as the OpenFlexure Microscope itself, is designed to be assembled and be usable by someone with **no programming or engineering experience**. The setup involves a few one-time steps for which detailed click-by-click guides have been written out; after that, daily use is a graphical interface with a few buttons.
 
 You will need to be comfortable with:
 
@@ -65,7 +66,7 @@ You will need to be comfortable with:
 - Following a step-by-step setup guide once
 
 
-You will **not** need to write code, use a command line day-to-day, or
+You will **not** need to write your own code, use a command line day-to-day, or
 understand how the machine learning works. However, information on all of the code is provided if you would wish to adapt/improve on what I have made here. 
 
 ---
@@ -116,7 +117,7 @@ number looks surprising.
 
 ### Total Cost:
 
-**~ 200£** (Excluding Analysis PC - the cost of this will vary depending on what you have lying around) 
+**~ 200£** (Excluding optional Analysis PC - the cost of this will vary depending on what you have lying around) 
 
 ### Software
 
@@ -144,7 +145,6 @@ Download the pre-configured image (link above) and write it to an SD card with
 OpenFlexure microscope software, network settings, Cell Counter — is already installed.
 
 I recommend a 32 GB SSD, but anything above 10 GB should be fine.
-
 The thresholding-watershed method for Cell Segmentation can run directly from the RPi so, if you do not wish to run Cellpose, this is all you would need to have a functional Cell Counter!
 
 ### 3. OPTIONAL - IF USING CELLPOSE
@@ -153,7 +153,7 @@ If wanting to use Cellpose for segmentation, you will need a second computer to 
 
 Sadly, some of the Cellpose dependencies (Torch) are very hard to setup and run dreadfully slow on the 32-bit ARM OS that is required by the OFM. Even after getting it working in my trials, running CellPose on even a couple images on the OFM itself took ~ 15 mins, making it non-viable for daily use.
 
-If you have any old PC lying around, this can be turned into a "server" which can process images taken on the OFM Cell Counter. The process outlining how to do this can be found in [docs/SERVER_SETUP](docs/SERVER_SETUP.md).
+If you have any old PC lying around, this can be turned into a "server" which can process images taken on the OFM Cell Counter. The process outlining how to do this can be found in [docs/SERVER_SETUP](docs/server_setup/SERVER_SETUP.md).
 
 The server setup assumes that you may not have full admin rights/control over your WiFI network (As is the case for me, using institutional WiFi). This is why, at least in my guide, the server will have to be directly connected to the Cell Counter via an ethernet cable. Keep this in mind if you are short on space/were hoping to have the server placed in a different room to the cell counter.
 
@@ -168,18 +168,18 @@ counter for real experiments.
 
 ## Daily use 
 
-1. Turn on the microscope (and optionally the analysis computer). The analysis service starts
-   by itself.
+1. Turn on the microscope (and optionally the analysis computer - the analysis service starts
+   by itself.)
 2. Pipette **50 µL** of cell suspension onto a 22 × 22 mm coverslip and mount it.
 3. Launch the appropriate Cell Counter using the Desktop Shortcut:
-    - **Cell Counter Server (fast)** = Use Cellpose (requires ethernet connection to analysis computer)
+    - **Cell Counter Server (fast)** = Use Cellpose (requires ethernet connection to a configured analysis computer/server)
     - **Cell Counter Local (very fast)** = Use Contrast-based Thresholding (runs on RPi itself) 
 4. Press **Ok**. The microscope takes four images across the coverslip.
 6. Results appear in a few seconds:
    - Total cells counted
    - Concentration in cells/mL
    - An image showing exactly which cells were counted
-Use the on-screen calculator to perform desired dilution calculations
+   - **Use the on-screen calculator to perform desired dilution calculations**
 
 **Always look at the outline image.** It's the quickest way to spot a bad count —
 debris counted as cells, clumps counted as one, or cells missed because the
@@ -202,7 +202,9 @@ Cellpose needs to know roughly how large your cells are, in pixels. Getting this
 
 As outlined above, this Cell Counter was validated and setup for HEK-293 cells (where I found a diam value of 15.328 worked best). However, if your cells are significantly smaller/larger, you may need to adjust this parameter.
 
-To find a good value for this, take a couple images of your cells on your OFM and send it to a PC capable of running cellpose. You will essentially be wanting to open the [Cellpose GUI](https://cellpose.readthedocs.io/en/latest/gui.html), import this image, and press the 'Calibrate' button to find a recommended diameter value. You can also follow this [YouTube guide](https://www.youtube.com/watch?v=5qANHWoubZU) to see how to do this in more detail (From start until ~7 mins in).
+To find a good value for this, take a couple images of your cells on your OFM and send it to a PC capable of running cellpose. You will essentially be wanting to open the [Cellpose GUI](https://cellpose.readthedocs.io/en/latest/gui.html), import this image, and press the 'Calibrate' button to find a recommended diameter value. 
+
+You can also follow this [YouTube guide](https://www.youtube.com/watch?v=5qANHWoubZU) to see how to do this in more detail (From start until ~7 mins in). If you watch the rest of the tutorial, you can also at this point train a custom model for your microscope to use instead, which may work much better. The final step in [docs/SERVER_SETUP](docs/server_setup/SERVER_SETUP.md) goes over how to get the server to use your custom model instead. 
 
 Once you have the recommended diameter value, change it in the
 `~/.cell_counter/server.conf` file on the microscope:
@@ -251,8 +253,6 @@ Being upfront about these:
 
 | Problem | What to check |
 |---|---|
-| "Could not reach the analysis server" | Is the analysis computer on and the service running? Is the Ethernet cable plugged in at both ends? |
-| "Server rejected the auth token" | The security code on the microscope and the analysis computer don't match — see `docs/SETUP.md` step A3 |
 | Count is obviously wrong | Look at the outline image. Usually focus, or the diameter setting |
 | Everything counted as one big blob | Diameter set far too large |
 | Nothing detected at all | Diameter set far too small, or the image is out of focus |
