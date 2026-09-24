@@ -2,13 +2,15 @@
 
 A simple automated cell counter built on the [OpenFlexure Microscope](https://openflexure.org/),
 using either traditional contrast-based or deep-learning segmentation to count cells in suspension to assist in calculating
-concentrations — all in under 30 seconds, without a haemocytometer.
+concentrations — all in under 60 seconds, without a haemocytometer!
 
-> 📝 **TODO —** Add a photo or short GIF of the assembled instrument here. It is
-> the single most useful thing on the page for a first-time reader.
+### Cell Counter
 
-> 📝 **TODO —** Add badges (licence, DOI, build status) once you've chosen a
-> licence and, if you plan to, minted a Zenodo DOI.
+![alt text](/.github/images/Counter.jpg)
+
+### GUI
+
+![alt text](/.github/images/Software.png)
 
 ---
 
@@ -18,10 +20,8 @@ concentrations — all in under 30 seconds, without a haemocytometer.
 - [Who it's for](#who-its-for)
 - [How it works](#how-it-works)
 - [What you'll need](#what-youll-need)
-- [Repository structure](#repository-structure)
 - [Getting started](#getting-started)
 - [Daily use](#daily-use)
-- [How the concentration is calculated](#how-the-concentration-is-calculated)
 - [Validating your instrument](#validating-your-instrument)
 - [Limitations](#limitations)
 - [Troubleshooting](#troubleshooting)
@@ -36,28 +36,48 @@ Counting cells with a haemocytometer is slow, tedious, and notoriously variable
 between operators. Automated cell counters solve this but cost several thousand
 pounds, lock you into proprietary consumables, and are impossible to repair yourself.
 
-This project turns an OpenFlexure Microscope — an open-source, 3D-printed,
-motorised microscope — into an automated cell counter. You pipette your
-suspension onto a coverslip, press a button, and get a cell count and
+This project turns an [OpenFlexure Microscope](https://www.youtube.com/watch?v=InmLDDsRmb4) — an open-source, 3D-printed,
+motorised microscope — into an automated cell counter. You pipette your suspension onto a coverslip, press a button, and get a cell count and
 concentration back in a few seconds. 
 
-As a side-note, the microscope is a fully motorized and customisable brightfield microscope; the software provided here is simply a single use-case.
+>As a side-note, the microscope is a fully motorized and customisable brightfield microscope; the software provided here is simply a single use-case. If you ever invest in a professional cell counter, this can easily be re-purposed for another project!
 
 There are 2 options for performing cell segmentation; either a traditional threshold-and-watershed approach or one that uses [Cellpose](https://www.cellpose.org/), a deep-learning model that handles
 touching, overlapping, and irregularly shaped cells far better.
 
-The Cellpose model included in this repo is **cyto2** fine tuned on images of HEK-293 cells taken on several different OpenFlexure microscopes. It is very easy to swap out the model used for one that you have trained yourself, as is covered in the server setup guide. 
+The Cellpose model included in this repo is **cyto2** fine tuned on images of HEK-293 cells taken on several different OpenFlexure microscopes. It is very easy to swap out the model used for one that you have trained yourself, as is covered in the server setup guide.
+
+### Accuracy of Cell Counter
+
+![alt text](/.github/images/Cell_graph-1.png)
+
+**Shown above is a comparison of the cell counts given by my cell counter to those calculated by an Invitrogen Cell Countess to get an estimate of the expected error at different suspension concentrations.**
+
+Across most of the range of initial concentrations of cell suspensions from semi-confluent to confluent T25-T175 flasks (*blue box*), both methods performed similarily and varied by less than 50% (*grey dotted line*) from the Cell Countess. 
+
+### In this range, a **mean error** of **19.1%** (*Cellpose*) and **34.2%** (*Threshold*) were achieved. 
+This is within the range of [expected error in manual cell counting](https://chemometec.com/how-to-count-cells-with-a-hemocytometer/) (20-30%) which makes both methods suitable substitutions to the use of a haemocytometer for a lot of cell culture experiments.
 
 
-> 📝 **TODO —** Add a sentence on which cell type(s) you have validated this
-> with, and the concentration range over which it works. Readers will want to
-> know whether it applies to their cells.
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 
 ## Who it's for
 
-This Cell Counter is mostly for people working in cell culture who routinely need to perform cell suspension dilution calculations, who may not need/want to spend thousands on more advanced systems. 
+>This Cell Counter is for people working in cell culture who routinely need to perform cell suspension dilution calculations, who may not need/want to spend thousands on more advanced systems. 
+
 This counter, as the OpenFlexure Microscope itself, is designed to be assembled and be usable by someone with **no programming or engineering experience**. The setup involves a few one-time steps for which detailed click-by-click guides have been written out; after that, daily use is a graphical interface with a few buttons.
 
 You will need to be comfortable with:
@@ -109,15 +129,16 @@ number looks surprising.
 | Item | Notes | Approx. cost |
 |---|---|---|
 | [OpenFlexure Microscope](https://openflexure.org/) | Simple optics are sufficient and use most up-to-date hardware version | ~100£ or ~160£ from a vendor (Exluding RPi) |
-| Raspberry Pi 4B | I used 4B, but 2 GB is sufficient | These have recently got more expensive, so expect 50-90£ |
-| Analysis computer (Optional) | Any old PC that can be connected to the scope via an ethernet cable. Helps tremendously if it has an NVIDIA Graphics card supporting CUDA, but is not an absolute requirement. | Existing hardware |
-| Ethernet patch cable (Optional) | Ordinary cable | ~£5 |
+| Raspberry Pi 4B | I used 4GB model, but 2 GB should be sufficient | These have recently got more expensive, so including separate to microscope. Expect 50-90£ |
+| Microscope Peripherals | You'll need a seperate screen/mouse + keyboard to control the microscope. The cost will depend on how compact you want it to be. I used a [very small screen](https://www.amazon.co.uk/ELECROW-Touchscreen-1024x600-Compatible-Raspberry/dp/B0G5YL9Z66?ref_=ast_bl_cpl_dp&th=1) I found on amazon and an old bluetooth mouse/keyboard I found in the office. | Existing hardware or ~50£ |
+| Analysis computer (Optional) | Any old PC that can be connected to the scope via an ethernet cable. Helps tremendously if it has any NVIDIA Graphics card supporting CUDA, but is not an absolute requirement. | Existing hardware |
+| Ethernet cable (Optional) | Ordinary cable | ~£5 |
 | 22 × 22 mm glass coverslips | Whatever's cheapest, I just wash and re-use mine until they crack | £5 |
-| 3D-printed parts | STLs in [`hardware/`](hardware/) | Filament cost or ~10£ if using external service |
+| Additional 3D-printed parts | The 2 STLs in [`STLs/Custom_Holder`](STLs/Custom_Holder/) | Filament cost or ~10£ if using external service |
 
 ### Total Cost:
 
-**~ 200£** (Excluding optional Analysis PC - the cost of this will vary depending on what you have lying around) 
+**~ 200£** (Excluding optional Analysis PC/peripherals - the cost of this will vary depending on what you have lying around) 
 
 ### Software
 
@@ -134,20 +155,22 @@ Budget about **two hours** for first-time setup, excluding building the microsco
 
 ### 1. Build the microscope
 
-Acquire all parts required for the "Basic Optics" variant of the Open Flexure Microscope, and follow the [OpenFlexure assembly instructions](https://build.openflexure.org/). Please check out the list of [associated vendors](https://openflexure.org/about/vendors) if you would prefer to simply buy a complete assembly kit for the microscope.
-Then, once you have finished the build, add the parts from [`STLs`](STLS/Custom_Holder). See
-[`ASSEMBLY.md`](ASSEMBLY.md).
+Acquire all parts required for the "Basic Optics" variant of the Open Flexure Microscope, and follow the [OpenFlexure assembly instructions](https://build.openflexure.org/) to build the microscope. Please check out the list of [associated vendors](https://openflexure.org/about/vendors) if you would prefer to simply buy a complete assembly kit for the microscope.
+
+Then, once you have finished the build, just screw on the [`counting chamber`](STLs/Custom_Holder/counting_chamber.stl) from [`STLs`](STLS/Custom_Holder) onto the sample stage using 4 M3 bolts (the same type that you used to hold the sample clips in place). 
+
+![alt text](/.github/images/Fixture_cropped.jpg)
 
 ### 2. Flash the Raspberry Pi
 
 Download the pre-configured image (link above) and write it to an SD card with
-[Raspberry Pi Imager](https://www.raspberrypi.com/software/). Everything —
-OpenFlexure microscope software, network settings, Cell Counter — is already installed.
+[Raspberry Pi Imager](https://www.raspberrypi.com/software/). Put the SD card into your OF microscope, and boot it up. Everything —
+base OpenFlexure microscope software, network settings, Cell Counter software — is already installed. 
 
 I recommend a 32 GB SSD, but anything above 10 GB should be fine.
 The thresholding-watershed method for Cell Segmentation can run directly from the RPi so, if you do not wish to run Cellpose, this is all you would need to have a functional Cell Counter!
 
-### 3. OPTIONAL - IF USING CELLPOSE
+### 3. OPTIONAL - IF USING CELLPOSE - Set up Server
 
 If wanting to use Cellpose for segmentation, you will need a second computer to run the Cellpose segmentation. 
 
@@ -158,34 +181,84 @@ If you have any old PC lying around, this can be turned into a "server" which ca
 The server setup assumes that you may not have full admin rights/control over your WiFI network (As is the case for me, using institutional WiFi). This is why, at least in my guide, the server will have to be directly connected to the Cell Counter via an ethernet cable. Keep this in mind if you are short on space/were hoping to have the server placed in a different room to the cell counter.
 
 
-### 4. Calibrate
+### 4. Initial Setup and taking Flatfield Image
 
-**Don't skip this.** Run the calibration described in
+#### Whichever method you use for segmentation, please follow the proceeding steps before beginning to use the cell counter for the first time.
+
+**Don't skip this.** 
+
+Connect to your microscope using [**OpenFlexure Connect**](https://openflexure-microscope-software.readthedocs.io/en/latest/webapp/pane_navigate.html) tool which gives you full control of your microscope. 
+
+TLDR: you can use the mouse scroll wheel to focus, and keyboard arrows to move the stage in all 4 directions. You can change the sensitivity of the movement in the **Navigate** tab.
+
+You may notice the screen looks entirely white. To correct this, from within **OpenFlexure Connect** click **Settings** -> **Camera** and Click **Full Auto-Calibrate**.
+
+![alt text](/.github/images/Image.png)
+
+This should correct the camera parameters and give you a more reliable image in the **View** tab.
+
+Also, before you can use the cell counter you will need to provide it with a Flat-field image to correct for unevern illumination. 
+
+To do this, mount **50 µL** of whichever medium you usually dilute your cells in (DMEM etc.). 
+
+
+Then, using **OF Connect**, make sure you are completely centered on your sample holder and fully **out of focus**
+
+![alt text](/.github/images/RD_Image_27.png)
+
+Then, boot up the Flatfield generator - short cut can be found on desktop - and press **'Ok'**
+
+![alt text](/.github/images/RD_Image_25.png)
+
+After a short amount of time, the microscope will take a sufficient number of images to generate that flatfield that will be used to correct your images! 
+
+![alt text](/.github/images/RD_Image_25-1.png)
+
+Optionally, run the calibration described in
 [Validating your instrument](#validating-your-instrument) before using the
 counter for real experiments.
+
+### 5. Use for Cell Counting
+
+The Cell Counter should now be fully setup. Use to your hearts content!
 
 ---
 
 ## Daily use 
 
+A video showing the entire process can be found below:
+
 1. Turn on the microscope (and optionally the analysis computer - the analysis service starts
    by itself.)
-2. Pipette **50 µL** of cell suspension onto a 22 × 22 mm coverslip and mount it.
-3. Launch the appropriate Cell Counter using the Desktop Shortcut:
+
+2. Pipette **50 µL** of cell suspension onto a 22 × 22 mm coverslip and mount it using a second coverslip.
+
+3. If this is the first time you have used the microscope/haven't used it in a while, focus on your cells using **OpenFlexure Connect**
+
+4. Launch the appropriate Cell Counter using the Desktop Shortcut:
     - **Cell Counter Server (fast)** = Use Cellpose (requires ethernet connection to a configured analysis computer/server)
-    - **Cell Counter Local (very fast)** = Use Contrast-based Thresholding (runs on RPi itself) 
-4. Press **Ok**. The microscope takes four images across the coverslip.
+    ![alt text](/.github/images/Masking-1.png)
+    - **Cell Counter Local (very fast)** = Use Contrast-based Thresholding (runs on the OFM itself) 
+    ![alt text](/.github/images/Masking_Threshold.png)
+
+    
+
+5. Press **Ok**. The microscope performs an autofocus and takes four images across the 
+coverslip.
+
 6. Results appear in a few seconds:
    - Total cells counted
    - Concentration in cells/mL
    - An image showing exactly which cells were counted
    - **Use the on-screen calculator to perform desired dilution calculations**
 
+
+
 **Always look at the outline image.** It's the quickest way to spot a bad count —
 debris counted as cells, clumps counted as one, or cells missed because the
 focus drifted. If there are any problems, try to ammend them, and count again. 
 
-If the focus has drifted far too much, you may need to re-focus using the **OFM Connect** tool, which gives you full control over the microscope.
+If the focus has drifted far too much, you may need to re-focus using the **OpenFlexure Connect** tool, which gives you full control over the microscope.
 
 
 
@@ -204,20 +277,18 @@ As outlined above, this Cell Counter was validated and setup for HEK-293 cells (
 
 To find a good value for this, take a couple images of your cells on your OFM and send it to a PC capable of running cellpose. You will essentially be wanting to open the [Cellpose GUI](https://cellpose.readthedocs.io/en/latest/gui.html), import this image, and press the 'Calibrate' button to find a recommended diameter value. 
 
-You can also follow this [YouTube guide](https://www.youtube.com/watch?v=5qANHWoubZU) to see how to do this in more detail (From start until ~7 mins in). If you watch the rest of the tutorial, you can also at this point train a custom model for your microscope to use instead, which may work much better. The final step in [docs/SERVER_SETUP](docs/server_setup/SERVER_SETUP.md) goes over how to get the server to use your custom model instead. 
+You can also follow this [YouTube guide](https://www.youtube.com/watch?v=5qANHWoubZU) to see how to do this in more detail (From start until ~7 mins in). If you watch the rest of the tutorial, you could also at this point train a custom model for your microscope to use instead, which may work much better. The final step in [docs/SERVER_SETUP](docs/server_setup/SERVER_SETUP.md) goes over how to get the server to use your custom model instead. 
 
-Once you have the recommended diameter value, change it in the
-`~/.cell_counter/server.conf` file on the microscope:
+Once you have the recommended diameter value, change it in the worker file on the server using `sudo systemctl edit --full cellcounter-worker`, and changing the "CELLCOUNT_DIAMETER" parameter. 
 
-```
-diameter = 40
-```
+![Image_9.png](/.github/images/Image_9.png)
+
 
 ### 2. Compare against a haemocytometer
 
 Run the same suspension both ways, across at least three different
 concentrations spanning your working range. They should agree within the
-haemocytometer's own variability (typically ±10–20%).
+haemocytometer's own variability.
 
 If they disagree systematically:
 
@@ -238,6 +309,8 @@ Being upfront about these:
 - **Not a validated clinical or diagnostic device.** This is a research tool.
 - **Cells must be reasonably well separated.** Dense or heavily clumped
   suspensions could undercount, as clumps get merged.
+- **Poor performance at very low concentrations.** As the stage movement is relatively slow and speed is paramount, at low suspension concentrations, only using 4 FOV means the camera will capture very few cells. This means the error can become quite large. Only use this cell counter for splitting/diluting down cell suspensions from relatively confluent flasks 
+
 - **No viability staining.** This counts cells, it does not distinguish live from
   dead. Trypan blue exclusion is not currently supported.
 - **Assumes even settling.** Uneven distribution across the coverslip is the

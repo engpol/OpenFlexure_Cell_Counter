@@ -43,11 +43,10 @@ EnvironmentFile=/etc/cell_counter/worker.env
 # CellPose GUI. A path is detected automatically and loaded with
 # pretrained_model= rather than model_type=.
 #   Environment=CELLCOUNT_MODEL=/opt/cell_counter/models/my_custom_model
+
 Environment=CELLCOUNT_MODEL=cyto2
 Environment=CELLCOUNT_GPU=auto
 
-# Fallback diameter, used only when the Pi does NOT send one. A 'diameter'
-# line in the Pi's server.conf overrides this on every request.
 Environment=CELLCOUNT_DIAMETER=15.33
 
 # CellPose writes downloaded model weights to ~/.cellpose. Nothing here stops
