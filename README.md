@@ -6,11 +6,11 @@ concentrations — all in under 60 seconds, without a haemocytometer!
 
 ### Cell Counter
 
-![alt text](/.git/images/Counter.jpg)
+![alt text](/img_dump/images/Counter.jpg)
 
 ### GUI
 
-![alt text](/.git/images/Software.png)
+![alt text](/img_dump/images/Software.png)
 
 ---
 
@@ -45,11 +45,11 @@ concentration back in a few seconds.
 There are 2 options for performing cell segmentation; either a traditional threshold-and-watershed approach or one that uses [Cellpose](https://www.cellpose.org/), a deep-learning model that handles
 touching, overlapping, and irregularly shaped cells far better.
 
-The Cellpose model included in this repo is **cyto2** fine tuned on images of HEK-293 cells taken on several different OpenFlexure microscopes. It is very easy to swap out the model used for one that you have trained yourself, as is covered in the server setup guide.
+The Cellpose model included in this repo is **cyto2** fine tuned on images of HEK-293 cells taken on several different OpenFlexure microscopes. It is very easy to use it, or even one you have trained yourself, and it is covered in the server setup guide.
 
 ### Accuracy of Cell Counter
 
-![alt text](/.git/images/Cell_graph-1.png)
+![alt text](/img_dump/images/Cell_graph-1.png)
 
 **Shown above is a comparison of the cell counts given by my cell counter to those calculated by an Invitrogen Cell Countess to get an estimate of the expected error at different suspension concentrations.**
 
@@ -159,7 +159,7 @@ Acquire all parts required for the "Basic Optics" variant of the Open Flexure Mi
 
 Then, once you have finished the build, just screw on the [`counting chamber`](STLs/Custom_Holder/counting_chamber.stl) from [`STLs`](STLs/Custom_Holder) onto the sample stage using 4 M3 bolts (the same type that you used to hold the sample clips in place). 
 
-![alt text](/.git/images/Fixture_cropped.jpg)
+![alt text](/img_dump/images/Fixture_cropped.jpg)
 
 ### 2. Flash the Raspberry Pi
 
@@ -193,7 +193,7 @@ TLDR: you can use the mouse scroll wheel to focus, and keyboard arrows to move t
 
 You may notice the screen looks entirely white. To correct this, from within **OpenFlexure Connect** click **Settings** -> **Camera** and Click **Full Auto-Calibrate**.
 
-![alt text](/.git/images/Image.png)
+![alt text](/img_dump/images/Image.png)
 
 This should correct the camera parameters and give you a more reliable image in the **View** tab.
 
@@ -204,15 +204,15 @@ To do this, mount **50 µL** of whichever medium you usually dilute your cells i
 
 Then, using **OF Connect**, make sure you are completely centered on your sample holder and fully **out of focus**
 
-![alt text](/.git/images/RD_Image_27.png)
+![alt text](/img_dump/images/RD_Image_27.png)
 
 Then, boot up the Flatfield generator - short cut can be found on desktop - and press **'Ok'**
 
-![alt text](/.git/images/RD_Image_25.png)
+![alt text](/img_dump/images/RD_Image_25.png)
 
 After a short amount of time, the microscope will take a sufficient number of images to generate that flatfield that will be used to correct your images! 
 
-![alt text](/.git/images/RD_Image_25-1.png)
+![alt text](/img_dump/images/RD_Image_25-1.png)
 
 Optionally, run the calibration described in
 [Validating your instrument](#validating-your-instrument) before using the
@@ -237,9 +237,9 @@ A video showing the entire process can be found below:
 
 4. Launch the appropriate Cell Counter using the Desktop Shortcut:
     - **Cell Counter Server (fast)** = Use Cellpose (requires ethernet connection to a configured analysis computer/server)
-    ![alt text](/.git/images/Masking-1.png)
+    ![alt text](/img_dump/images/Masking-1.png)
     - **Cell Counter Local (very fast)** = Use Contrast-based Thresholding (runs on the OFM itself) 
-    ![alt text](/.git/images/Masking_Threshold.png)
+    ![alt text](/img_dump/images/Masking_Threshold.png)
 
     
 
@@ -281,7 +281,7 @@ You can also follow this [YouTube guide](https://www.youtube.com/watch?v=5qANHWo
 
 Once you have the recommended diameter value, change it in the worker file on the server using `sudo systemctl edit --full cellcounter-worker`, and changing the "CELLCOUNT_DIAMETER" parameter. 
 
-![Image_9.png](/.git/images/Image_9.png)
+![Image_9.png](/img_dump/images/Image_9.png)
 
 
 ### 2. Compare against a haemocytometer
