@@ -42,18 +42,18 @@ Once you have installed Xubuntu on your server and have internet access, continu
 
 Open up terminal on your server:
 
-![SS2.png](/.github/images/SS2.png)
+![SS2.png](/.git/images/SS2.png)
 
 In the terminal, run the following code. You can copy it from this block, paste it in the terminal and press Enter.  This will copy all required files from the repo onto the server.
 
 ```python
 sudo apt update
 sudo apt install -y git
-git clone https://github.com/engpol/OpenFlexure_Cell_Counter.git ~/cell_counter_repo
+git clone https:/.git.com/engpol/OpenFlexure_Cell_Counter.git ~/cell_counter_repo
 cd ~/cell_counter_repo/SERVER_FILES
 ```
 
-![Image_1.png](/.github/images/Image_1.png)
+![Image_1.png](/.git/images/Image_1.png)
 
 ---
 
@@ -64,7 +64,7 @@ cd ~/cell_counter_repo/SERVER_FILES
 Now run the following command block inside the terminal to install Python onto the server. 
 
 ```python
-wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+wget https:/.git.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
 bash Miniforge3-Linux-x86_64.sh -b -p "$HOME/miniforge3"
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
 conda init bash
@@ -72,9 +72,9 @@ conda init bash
 
 (Some SS of what this should look like)
 
-![SS5.png](/.github/images/SS5.png)
+![SS5.png](/.git/images/SS5.png)
 
-![SS6.png](/.github/images/SS6.png)
+![SS6.png](/.git/images/SS6.png)
 
 Now Close and reopen the terminal, then run the following code block to create the virtual environment which will run the python code. 
 
@@ -84,13 +84,13 @@ conda create -n cellcount python=3.10 -y
 conda activate cellcount
 ```
 
-![SS7.png](/.github/images/SS7.png)
+![SS7.png](/.git/images/SS7.png)
 
-![SS8.png](/.github/images/SS8.png)
+![SS8.png](/.git/images/SS8.png)
 
 Your terminal prompt should now start with `(cellcount)`. 
 
-![SS9.png](/.github/images/751d836c-e26c-44b8-bc86-98e45d000a53.png)
+![SS9.png](/.git/images/751d836c-e26c-44b8-bc86-98e45d000a53.png)
 
 **It must stay active for steps 3 and 4**. If you close the terminal for any reason, you will have to restart the environment by running `conda activate cellcount` again.
 
@@ -120,11 +120,11 @@ First check what you have by running this command:
 nvidia-smi
 ```
 
-![SS3.png](/.github/images/SS3.png)
+![SS3.png](/.git/images/SS3.png)
 
 Even if you have an NVIDIA GPU, you may have to install nvidia-sma. Install it using one of the commands suggested in the terminal. Then run `nvidia-smi` again.
 
-![SS4.png](/.github/images/SS4.png)
+![SS4.png](/.git/images/SS4.png)
 
 Check "CUDA Version" (shown in the screen shot above in the top-right by `nvidia-smi`).
 
@@ -149,11 +149,11 @@ pip install -r requirements.txt
 python check_gpu.py
 ```
 
-![Image_4.png](/.github/images/Image_4.png)
+![Image_4.png](/.git/images/Image_4.png)
 
 This installs other required python packages, and prints whether the GPU will actually be used, and if not, exactly why.
 
-![Image_3.png](/.github/images/Image_3.png)
+![Image_3.png](/.git/images/Image_3.png)
 
 ---
 
@@ -186,7 +186,7 @@ ip link
 
 (I used ip addr show, but it should look similar)
 
-![SS16.png](/.github/images/cecc4ce0-3759-47e4-a8b4-1ed04ca285d2.png)
+![SS16.png](/.git/images/cecc4ce0-3759-47e4-a8b4-1ed04ca285d2.png)
 
 Look for a wired interface — `enp3s0`, `eno1`, or similar. Not `lo`, and not whichever one carries your normal network. For me, this was eno1. To test this, you can unplug the ethernet, and see which interface dissapears. Keep a note of this name.
 
@@ -196,23 +196,23 @@ I will show two ways of setting up the networking between the server and the OFM
 
 1. Run `nm-connection-editor` in terminal to open up the networking GUI
 
-![SS16.png](/.github/images/SS16.png)
+![SS16.png](/.git/images/SS16.png)
 
 2. Select the wired connection for the interface identified above, click the gear icon.
 
-![SS17.png](/.github/images/SS17.png)
+![SS17.png](/.git/images/SS17.png)
 
 3. **IPv4 Settings** → Method: **Manual**.
 
-![SS18.png](/.github/images/SS18.png)
+![SS18.png](/.git/images/SS18.png)
 
 4. **Add**: Address `192.168.50.10`, Netmask `255.255.255.0`, Gateway **empty**.
 
-![SS19.png](/.github/images/SS19.png)
+![SS19.png](/.git/images/SS19.png)
 
 5. Click **Routes…** and tick **"Use this connection only for resources on its own network."**
 
-![SS20.png](/.github/images/SS20.png)
+![SS20.png](/.git/images/SS20.png)
 
 6. Save.
 
@@ -243,7 +243,7 @@ ping -c 3 192.168.50.1   # the Pi should answer
 
 What this should look like:
 
-![/.github/images/SS23.png](6371d020-8838-4bba-a195-ddbd175656eb.png)
+![6371d020-8838-4bba-a195-ddbd175656eb.png](/.git/images/6371d020-8838-4bba-a195-ddbd175656eb.png)
 
 ---
 
@@ -256,7 +256,7 @@ Now, run the following script, which should for the most part finish the setup f
 sudo bash install_service.sh
 ```
 
-![Image_6.png](/.github/images/Image_6.png)
+![Image_6.png](/.git/images/Image_6.png)
 
 In case you are wondering the script does the following:
 
@@ -327,7 +327,7 @@ After about 30s, run the `curl [http://192.168.50.10:8000/health](http://192.168
 
 Getting the server to use custom trained cellpose models is very simple.
 
-**ONLY** If this is your first time adding a custom model to the cell counter, run the following code to make a folder to keep all your custom models in:
+**ONLY** If this is your first time adding a custom model to the cell counter, run the following code on the server to make a folder to keep all your custom models in:
 
 ```python
 sudo mkdir -p /opt/cell_counter/models
@@ -336,7 +336,7 @@ sudo chown -R $USER:$USER /opt/cell_counter/models
 
 ### Changing Models:
 
-Using a USB stick or whichever way you’d like, move the model file for the model you’d like to use into the /opt/cell_counter/models folder. 
+Using a USB stick or whichever way you’d like, move the model file for the model you’d like to use into the /opt/cell_counter/models folder. If you would like to use the model I trained on HEK-293 cells, you can find it in the [CELLPOSE_MODELS](/CELLPOSE_MODELS/) directory.
 
 Then, to make the server use this custom model instead of the default cyto2:
 
@@ -345,14 +345,14 @@ First run this:
 ```python
 sudo systemctl edit --full cellcounter-worker
 ```
-![Image_9.png](/.github/images/Image_9.png)
+![Image_9.png](/.git/images/Image_9.png)
 
 In the file that opens up, change the “CELLCOUNT_MODEL” to point to your custom model, e.g. “CP_20260916_120000”. Remember to also change the cellpose diameter "CELLCOUNT_DIAMETER" to whichever diam the model was trained on! 
 
 ```python
 Environment=CELLCOUNT_MODEL=/opt/cell_counter/models/CP_20260916_120000
 ```
-R
+
 
 Then, to restart the server and make sure it is now using your model:
 

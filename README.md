@@ -6,11 +6,11 @@ concentrations — all in under 60 seconds, without a haemocytometer!
 
 ### Cell Counter
 
-![alt text](/.github/images/Counter.jpg)
+![alt text](/.git/images/Counter.jpg)
 
 ### GUI
 
-![alt text](/.github/images/Software.png)
+![alt text](/.git/images/Software.png)
 
 ---
 
@@ -49,7 +49,7 @@ The Cellpose model included in this repo is **cyto2** fine tuned on images of HE
 
 ### Accuracy of Cell Counter
 
-![alt text](/.github/images/Cell_graph-1.png)
+![alt text](/.git/images/Cell_graph-1.png)
 
 **Shown above is a comparison of the cell counts given by my cell counter to those calculated by an Invitrogen Cell Countess to get an estimate of the expected error at different suspension concentrations.**
 
@@ -142,9 +142,9 @@ number looks surprising.
 
 ### Software
 
-Everything needed is free and open-source. The easiest way to get the cell counter running is by using the pre-configured image which can be downloaded using the button below (~9.1 GB).
+Everything needed is free and open-source. The easiest way to get the cell counter running is by using the pre-configured image which can be downloaded using the button below (~9.1 GB). In time, I may try to get this working as a PyPi package.
 
-[![Download](https://img.shields.io/badge/Download-OFM_Cell_Counter_IMAGE_(9.1_GB)-blue?style=for-the-badge&logo=download)](https://archive.org/download/ofm-cell-counter/OFM_Cell_Counter.img)
+[![Download](https://img.shields.io/badge/Download-OFM_Cell_Counter_IMAGE_(8.6_GB)-blue?style=for-the-badge&logo=download)](https://archive.org/download/ofm-image-shrunk/OFM_Image_Shrunk.img)
 
 
 ---
@@ -155,11 +155,11 @@ Budget about **two hours** for first-time setup, excluding building the microsco
 
 ### 1. Build the microscope
 
-Acquire all parts required for the "Basic Optics" variant of the Open Flexure Microscope, and follow the [OpenFlexure assembly instructions](https://build.openflexure.org/) to build the microscope. Please check out the list of [associated vendors](https://openflexure.org/about/vendors) if you would prefer to simply buy a complete assembly kit for the microscope.
+Acquire all parts required for the "Basic Optics" variant of the Open Flexure Microscope, and follow the [OpenFlexure assembly instructions](https://build.openflexure.org/) to build the microscope. Please check out the list of [associated vendors](https://openflexure.org/about/vendors) if you would prefer to simply buy a complete assembly kit for the microscope. I have included all STL files needed for the [OpenFlexure v7](STLs/OpenFlexure_v7_Beta) in this repo for your benefit. 
 
-Then, once you have finished the build, just screw on the [`counting chamber`](STLs/Custom_Holder/counting_chamber.stl) from [`STLs`](STLS/Custom_Holder) onto the sample stage using 4 M3 bolts (the same type that you used to hold the sample clips in place). 
+Then, once you have finished the build, just screw on the [`counting chamber`](STLs/Custom_Holder/counting_chamber.stl) from [`STLs`](STLs/Custom_Holder) onto the sample stage using 4 M3 bolts (the same type that you used to hold the sample clips in place). 
 
-![alt text](/.github/images/Fixture_cropped.jpg)
+![alt text](/.git/images/Fixture_cropped.jpg)
 
 ### 2. Flash the Raspberry Pi
 
@@ -193,7 +193,7 @@ TLDR: you can use the mouse scroll wheel to focus, and keyboard arrows to move t
 
 You may notice the screen looks entirely white. To correct this, from within **OpenFlexure Connect** click **Settings** -> **Camera** and Click **Full Auto-Calibrate**.
 
-![alt text](/.github/images/Image.png)
+![alt text](/.git/images/Image.png)
 
 This should correct the camera parameters and give you a more reliable image in the **View** tab.
 
@@ -204,15 +204,15 @@ To do this, mount **50 µL** of whichever medium you usually dilute your cells i
 
 Then, using **OF Connect**, make sure you are completely centered on your sample holder and fully **out of focus**
 
-![alt text](/.github/images/RD_Image_27.png)
+![alt text](/.git/images/RD_Image_27.png)
 
 Then, boot up the Flatfield generator - short cut can be found on desktop - and press **'Ok'**
 
-![alt text](/.github/images/RD_Image_25.png)
+![alt text](/.git/images/RD_Image_25.png)
 
 After a short amount of time, the microscope will take a sufficient number of images to generate that flatfield that will be used to correct your images! 
 
-![alt text](/.github/images/RD_Image_25-1.png)
+![alt text](/.git/images/RD_Image_25-1.png)
 
 Optionally, run the calibration described in
 [Validating your instrument](#validating-your-instrument) before using the
@@ -237,9 +237,9 @@ A video showing the entire process can be found below:
 
 4. Launch the appropriate Cell Counter using the Desktop Shortcut:
     - **Cell Counter Server (fast)** = Use Cellpose (requires ethernet connection to a configured analysis computer/server)
-    ![alt text](/.github/images/Masking-1.png)
+    ![alt text](/.git/images/Masking-1.png)
     - **Cell Counter Local (very fast)** = Use Contrast-based Thresholding (runs on the OFM itself) 
-    ![alt text](/.github/images/Masking_Threshold.png)
+    ![alt text](/.git/images/Masking_Threshold.png)
 
     
 
@@ -281,7 +281,7 @@ You can also follow this [YouTube guide](https://www.youtube.com/watch?v=5qANHWo
 
 Once you have the recommended diameter value, change it in the worker file on the server using `sudo systemctl edit --full cellcounter-worker`, and changing the "CELLCOUNT_DIAMETER" parameter. 
 
-![Image_9.png](/.github/images/Image_9.png)
+![Image_9.png](/.git/images/Image_9.png)
 
 
 ### 2. Compare against a haemocytometer
@@ -294,7 +294,7 @@ If they disagree systematically:
 
 | Pattern | Likely cause |
 |---|---|
-| Counter always reads **high** | Debris counted as cells, the four fields overlap so some cells are counted twice |
+| Counter always reads **high** | Debris counted as cells (more of an issue when testing suspension concentration is low), the four fields overlap so some cells are counted twice |
 | Counter always reads **low** | Cells out of focus, diameter set too small, or cells too sparse |
 | Disagreement grows with concentration | Cells clumping, or overlapping cells merged into one object |
 
