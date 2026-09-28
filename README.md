@@ -40,7 +40,7 @@ pounds, lock you into proprietary consumables, and are impossible to repair your
 
 This project turns an [OpenFlexure Microscope](https://www.youtube.com/watch?v=InmLDDsRmb4) — an open-source, 3D-printed,
 motorised microscope — into an automated cell counter. You pipette your suspension onto a coverslip, press a button, and get a cell count and
-concentration back in a few seconds. 
+concentration back in a few seconds. To see the cell counter in action [click here!](#daily-use)
 
 >As a side-note, the microscope is a fully motorized and customisable brightfield microscope; the software provided here is simply a single use-case. If you ever invest in a professional cell counter, this can easily be re-purposed for another project!
 
