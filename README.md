@@ -318,7 +318,7 @@ Being upfront about these:
 - **Field-of-view geometry is build-specific.** The area constants assume the a specific optics module and camera used in the 'Basic Optics' configuration of the OFM; if you change either, you would have to re-calibrate and modify some of the code.
 - **The four fields may overlap slightly.** Stage movement is calibrated in
   motor steps rather than measured distance, so a small overlap can cause modest
-  double-counting. Double check in the output no overlap is present.
+  double-counting. Double check in the output no overlap is present. Changing motor steps to correct for overlap is covered [here](docs/Cell_Counter_Docs.md).
 
 ---
 
@@ -331,8 +331,7 @@ Being upfront about these:
 | Nothing detected at all | Diameter set far too small, or the image is out of focus |
 | Analysis takes minutes, not seconds | The service restarted and is reloading the model — the first run after startup is always slower |
 
-More detail in [`docs/SETUP.md`](docs/SETUP.md) and
-[`docs/DIRECT_LINK_ADMIN.md`](docs/DIRECT_LINK_ADMIN.md).
+More detail in [docs/Cell_Counter_Docs](docs/Cell_Counter_Docs.md) and [docs/Server_Setup](docs/Server_Setup.md).
 
 Still stuck? [Open an issue](../../issues) with the error message, what you were
 doing, and a photo of the result image if relevant.
