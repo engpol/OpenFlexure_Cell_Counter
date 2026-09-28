@@ -1,3 +1,5 @@
+
+
 # OpenFlexure Cell Counter
 
 A simple automated cell counter built on the [OpenFlexure Microscope](https://openflexure.org/),
@@ -227,6 +229,8 @@ The Cell Counter should now be fully setup. Use to your hearts content!
 ## Daily use 
 
 A video showing the entire process can be found below:
+
+https://github.com/user-attachments/assets/5db055de-96ec-4996-82e9-81a2b3afec3e
 
 1. Turn on the microscope (and optionally the analysis computer - the analysis service starts
    by itself.)
